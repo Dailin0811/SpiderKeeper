@@ -248,6 +248,11 @@ class JobCtrl(flask_restful.Resource):
             job_instance.tags = post_data.get('tags')
             job_instance.run_type = post_data['run_type']
             job_instance.priority = post_data.get('priority', 0)
+            if job_instance.run_type == 'onetime':
+                job_instance.enabled = -1
+                db.session.add(job_instance)
+                db.session.commit()
+                agent.start_spider(job_instance)
             if job_instance.run_type == "periodic":
                 job_instance.cron_minutes = post_data.get('cron_minutes') or '0'
                 job_instance.cron_hour = post_data.get('cron_hour') or '*'
